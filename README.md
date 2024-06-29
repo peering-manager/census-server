@@ -1,14 +1,17 @@
 # Peering Manager Census API
 
-This repository contains the code the API server code that takes care of
-handling Peering Manager census records.
+This repository contains the API server code that takes care of handling
+Peering Manager census records.
 
 Census records are sent by Peering Manager instances running a version of the
 code greater or equal to 1.9.0, if the `CENSUS_REPORTING_ENABLED` setting of
 those instances is set to `True`.
 
 This server is in charge of storing census records in a database as well as
-providing a way to read those records. A census record is composed of:
+providing a way to read those records. It is able to send notifications when a
+record is created or updated.
+
+A census record is composed of:
 
 * `deployment_id` a pseudorandom unique identifier which goal is to
   anonymously identify a single instance of Peering Manager
