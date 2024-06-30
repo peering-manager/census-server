@@ -1,0 +1,7 @@
+__pycache__
+census_api.egg-info
+*.pyc
+.mypy_cache
+.coverage
+htmlcov
+.venv
