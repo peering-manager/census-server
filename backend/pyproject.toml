@@ -63,10 +63,7 @@ select = [
     "ISC",   # flake8-implicit-str-concat
     "N",     # pep8-naming
     "PIE",   # flake8-pie
-    "PLC",   # pylint convention
-    "PLE",   # pylint error
-    "PLR",   # pylint refactor
-    "PLW",   # pyling warning
+    "PL",    # pylint
     "PT",    # flake8-pytest-style
     "PTH",   # flake8-use-pathlib
     "PYI",   # flake8-pyi
