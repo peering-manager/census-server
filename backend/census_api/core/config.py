@@ -63,6 +63,8 @@ class Settings(BaseSettings):
             path=self.POSTGRES_DB,
         )
 
+    RATE_LIMIT: int = 3600 * 6  # Time in second between two updates
+
     IPINFO_API_URL: str = "https://ipinfo.io/"
     IPINFO_TOKEN: str = ""
 

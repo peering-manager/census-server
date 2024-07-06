@@ -5,6 +5,7 @@ from typing import Annotated
 from fastapi import APIRouter, Header, Query
 from sqlmodel import select
 
+from ...core.config import settings
 from ...core.dependencies import SessionDep
 from ...enums import CensusRecordEvent
 from ...models import CensusRecord, CensusRecordUpdate
@@ -32,10 +33,12 @@ async def create_record(
 
     event: CensusRecordEvent | None = None
     if db_record:
+        interval = (now - db_record.updated_at).total_seconds()
+
         if (
             db_record.version != record.version
             or db_record.python_version != record.python_version
-        ):
+        ) and interval >= settings.RATE_LIMIT:
             db_record.version = record.version
             db_record.python_version = record.python_version
             db_record.updated_at = now
