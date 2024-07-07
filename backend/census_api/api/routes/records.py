@@ -23,7 +23,6 @@ async def create_record(
     real_ip: Annotated[str | None, Header(alias="X-Real-IP")] = None,
 ) -> CensusRecord:
     now = datetime.now(tz=timezone.utc)
-    country = await resolve_country_for_ip(ip_address=real_ip) if real_ip else None
 
     statement = select(CensusRecord).where(
         CensusRecord.deployment_id == record.deployment_id
@@ -44,20 +43,21 @@ async def create_record(
             db_record.version = record.version
             db_record.python_version = record.python_version
             db_record.updated_at = now
-            db_record.country = country
             event = CensusRecordEvent.UPDATED
     else:
         db_record = CensusRecord(
             deployment_id=record.deployment_id,
             version=record.version,
             python_version=record.python_version,
-            country=country,
             created_at=now,
             updated_at=now,
         )
         event = CensusRecordEvent.CREATED
 
     if event:
+        db_record.country = (
+            await resolve_country_for_ip(ip_address=real_ip) if real_ip else None
+        )
         session.add(db_record)
         await session.commit()
         await session.refresh(db_record)
