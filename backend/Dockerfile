@@ -2,7 +2,7 @@ ARG PYTHON_VER=3.12
 FROM docker.io/python:${PYTHON_VER}-slim AS base
 
 ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONUNBUFFERED 1
+ENV PYTHONUNBUFFERED=1
 
 RUN apt-get update && \
     apt-get upgrade -y && \
