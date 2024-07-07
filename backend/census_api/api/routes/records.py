@@ -33,7 +33,9 @@ async def create_record(
 
     event: CensusRecordEvent | None = None
     if db_record:
-        interval = (now - db_record.updated_at).total_seconds()
+        interval = (
+            now - db_record.updated_at.astimezone(tz=timezone.utc)
+        ).total_seconds()
 
         if (
             db_record.version != record.version
