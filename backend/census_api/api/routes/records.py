@@ -3,12 +3,12 @@ from datetime import datetime, timezone
 from typing import Annotated
 
 from fastapi import APIRouter, Header, Query
-from sqlmodel import select
+from sqlmodel import select, text
 
 from ...core.config import settings
 from ...core.dependencies import SessionDep
 from ...enums import CensusRecordEvent
-from ...models import CensusRecord, CensusRecordUpdate
+from ...models import CensusRecord, CensusRecordUpdate, CensusSummaries, CensusSummary
 from ...notifications import discord_notify
 from ...utils import resolve_country_for_ip
 
@@ -76,3 +76,46 @@ async def read_records(
 ) -> Sequence[CensusRecord]:
     result = await session.exec(select(CensusRecord).offset(offset).limit(limit))
     return result.all()
+
+
+@router.get("/summary", response_model=CensusSummaries)
+async def read_summary(*, session: SessionDep) -> CensusSummaries:
+    summaries: dict[str, list[CensusSummary]] = {
+        "version": [],
+        "python_version": [],
+        "country": [],
+    }
+
+    for item in summaries:
+        query = f"""
+WITH item_counts AS (
+    SELECT {item}, COUNT(*) AS item_count FROM censusrecord GROUP BY {item}
+),
+ranked_items AS (
+    SELECT {item}, item_count,
+    ROW_NUMBER() OVER (ORDER BY item_count DESC) AS rn FROM item_counts
+),
+top_items AS (
+    SELECT {item}, item_count FROM ranked_items WHERE rn <= 5
+    UNION ALL
+    SELECT 'other' AS {item},
+    SUM(item_count) AS item_count FROM ranked_items WHERE rn > 5
+),
+total_count AS (
+    SELECT SUM(item_count) AS total_count FROM item_counts
+)
+SELECT ti.{item}, ti.item_count,
+ROUND(100.0 * ti.item_count / tc.total_count, 2) AS percentage
+FROM top_items ti, total_count tc ORDER BY ti.item_count DESC;
+"""
+        result = await session.exec(statement=text(query))
+        for r in result.fetchall():
+            summaries[item].append(
+                CensusSummary(
+                    label=r[0],
+                    count=0 if not r[1] else r[1],
+                    percentage=0 if not r[2] else r[2],
+                )
+            )
+
+    return CensusSummaries(**summaries)

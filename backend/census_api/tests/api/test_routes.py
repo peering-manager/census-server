@@ -154,3 +154,60 @@ async def test_read_censuses(session: AsyncSession, client: AsyncClient) -> None
     assert data[1]["country"] == census_2.country
     assert datetime.fromisoformat(data[1]["created_at"]) == census_1.created_at
     assert datetime.fromisoformat(data[1]["updated_at"]) == census_1.updated_at
+
+
+async def test_read_summary(session: AsyncSession, client: AsyncClient) -> None:
+    now = datetime.now(tz=timezone.utc)
+    session.add(
+        CensusRecord(
+            deployment_id="aaaaaaaaa",
+            version="1.8.0",
+            python_version="3.10.0",
+            country="FR",
+            created_at=now,
+            updated_at=now,
+        )
+    )
+    session.add(
+        CensusRecord(
+            deployment_id="bbbbbbbbb",
+            version="1.9.0",
+            python_version="3.12.0",
+            country="GB",
+            created_at=now,
+            updated_at=now,
+        )
+    )
+    session.add(
+        CensusRecord(
+            deployment_id="ccccccccc",
+            version="1.9.0",
+            python_version="3.12.0",
+            country="FR",
+            created_at=now,
+            updated_at=now,
+        )
+    )
+    await session.commit()
+
+    response = await client.get(f"{settings.API_V1_STR}/records/summary")
+    data = response.json()
+
+    assert response.status_code == codes.OK
+    assert data == {
+        "country": [
+            {"count": 2, "label": "FR", "percentage": 66.67},
+            {"count": 1, "label": "GB", "percentage": 33.33},
+            {"count": 0, "label": "other", "percentage": 0.0},
+        ],
+        "python_version": [
+            {"count": 2, "label": "3.12.0", "percentage": 66.67},
+            {"count": 1, "label": "3.10.0", "percentage": 33.33},
+            {"count": 0, "label": "other", "percentage": 0.0},
+        ],
+        "version": [
+            {"count": 2, "label": "1.9.0", "percentage": 66.67},
+            {"count": 1, "label": "1.8.0", "percentage": 33.33},
+            {"count": 0, "label": "other", "percentage": 0.0},
+        ],
+    }
