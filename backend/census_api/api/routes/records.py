@@ -106,16 +106,19 @@ total_count AS (
 )
 SELECT ti.{item}, ti.item_count,
 ROUND(100.0 * ti.item_count / tc.total_count, 2) AS percentage
-FROM top_items ti, total_count tc ORDER BY ti.item_count DESC;
+FROM top_items ti, total_count tc ORDER BY percentage DESC;
 """
         result = await session.exec(statement=text(query))
         for r in result.fetchall():
+            label: str = r[0]
+            count: int = 0 if not r[1] else r[1]
+            percentage: float = 0 if not r[2] else r[2]
+
+            if label == "other" and count == 0:
+                continue
+
             summaries[item].append(
-                CensusSummary(
-                    label=r[0],
-                    count=0 if not r[1] else r[1],
-                    percentage=0 if not r[2] else r[2],
-                )
+                CensusSummary(label=label, count=count, percentage=percentage)
             )
 
     return CensusSummaries(**summaries)

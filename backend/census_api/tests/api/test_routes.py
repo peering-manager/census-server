@@ -158,36 +158,56 @@ async def test_read_censuses(session: AsyncSession, client: AsyncClient) -> None
 
 async def test_read_summary(session: AsyncSession, client: AsyncClient) -> None:
     now = datetime.now(tz=timezone.utc)
-    session.add(
-        CensusRecord(
-            deployment_id="aaaaaaaaa",
-            version="1.8.0",
-            python_version="3.10.0",
-            country="FR",
-            created_at=now,
-            updated_at=now,
+    deployment_ids = [
+        "a" * 10,
+        "b" * 10,
+        "c" * 10,
+        "d" * 10,
+        "e" * 10,
+        "f" * 10,
+        "0" * 10,
+        "1" * 10,
+        "2" * 10,
+        "3" * 10,
+    ]
+    versions = [
+        "1.8.0",
+        "1.8.0",
+        "1.9.0",
+        "1.9.0",
+        "1.9.0",
+        "1.9.0",
+        "1.7.0",
+        "1.7.0",
+        "1.6.0",
+        "1.5.0",
+    ]
+    python_versions = [
+        "3.10.0",
+        "3.11.0",
+        "3.11.0",
+        "3.12.0",
+        "3.12.0",
+        "3.12.0",
+        "3.9.0",
+        "3.9.0",
+        "3.9.0",
+        "3.9.0",
+    ]
+    countries = ["FR", "GB", "DE", "IT", "FR", "GB", "US", "US", "US", "CA"]
+    for deployment_id, version, python_version, country in zip(
+        deployment_ids, versions, python_versions, countries, strict=False
+    ):
+        session.add(
+            CensusRecord(
+                deployment_id=deployment_id,
+                version=version,
+                python_version=python_version,
+                country=country,
+                created_at=now,
+                updated_at=now,
+            )
         )
-    )
-    session.add(
-        CensusRecord(
-            deployment_id="bbbbbbbbb",
-            version="1.9.0",
-            python_version="3.12.0",
-            country="GB",
-            created_at=now,
-            updated_at=now,
-        )
-    )
-    session.add(
-        CensusRecord(
-            deployment_id="ccccccccc",
-            version="1.9.0",
-            python_version="3.12.0",
-            country="FR",
-            created_at=now,
-            updated_at=now,
-        )
-    )
     await session.commit()
 
     response = await client.get(f"{settings.API_V1_STR}/records/summary")
@@ -196,18 +216,84 @@ async def test_read_summary(session: AsyncSession, client: AsyncClient) -> None:
     assert response.status_code == codes.OK
     assert data == {
         "country": [
-            {"count": 2, "label": "FR", "percentage": 66.67},
-            {"count": 1, "label": "GB", "percentage": 33.33},
-            {"count": 0, "label": "other", "percentage": 0.0},
+            {
+                "count": 3,
+                "label": "US",
+                "percentage": 30.0,
+            },
+            {
+                "count": 2,
+                "label": "FR",
+                "percentage": 20.0,
+            },
+            {
+                "count": 2,
+                "label": "GB",
+                "percentage": 20.0,
+            },
+            {
+                "count": 1,
+                "label": "CA",
+                "percentage": 10.0,
+            },
+            {
+                "count": 1,
+                "label": "DE",
+                "percentage": 10.0,
+            },
+            {
+                "count": 1,
+                "label": "other",
+                "percentage": 10.0,
+            },
         ],
         "python_version": [
-            {"count": 2, "label": "3.12.0", "percentage": 66.67},
-            {"count": 1, "label": "3.10.0", "percentage": 33.33},
-            {"count": 0, "label": "other", "percentage": 0.0},
+            {
+                "count": 4,
+                "label": "3.9.0",
+                "percentage": 40.0,
+            },
+            {
+                "count": 3,
+                "label": "3.12.0",
+                "percentage": 30.0,
+            },
+            {
+                "count": 2,
+                "label": "3.11.0",
+                "percentage": 20.0,
+            },
+            {
+                "count": 1,
+                "label": "3.10.0",
+                "percentage": 10.0,
+            },
         ],
         "version": [
-            {"count": 2, "label": "1.9.0", "percentage": 66.67},
-            {"count": 1, "label": "1.8.0", "percentage": 33.33},
-            {"count": 0, "label": "other", "percentage": 0.0},
+            {
+                "count": 4,
+                "label": "1.9.0",
+                "percentage": 40.0,
+            },
+            {
+                "count": 2,
+                "label": "1.7.0",
+                "percentage": 20.0,
+            },
+            {
+                "count": 2,
+                "label": "1.8.0",
+                "percentage": 20.0,
+            },
+            {
+                "count": 1,
+                "label": "1.5.0",
+                "percentage": 10.0,
+            },
+            {
+                "count": 1,
+                "label": "1.6.0",
+                "percentage": 10.0,
+            },
         ],
     }
