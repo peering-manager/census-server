@@ -120,5 +120,9 @@ FROM top_items ti, total_count tc ORDER BY percentage DESC;
             summaries[item].append(
                 CensusSummary(label=label, count=count, percentage=percentage)
             )
+        # Sort by count reverse (higher to lower) and consider other always to be last
+        summaries[item].sort(
+            key=lambda k: k.count if k.label != "other" else 0, reverse=True
+        )
 
     return CensusSummaries(**summaries)
