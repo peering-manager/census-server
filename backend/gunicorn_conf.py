@@ -13,6 +13,7 @@ port = os.getenv("PORT", "8000")
 bind_env = os.getenv("BIND", None)
 use_loglevel = os.getenv("LOG_LEVEL", "info")
 use_bind = bind_env if bind_env else f"{host}:{port}"
+forwarded_allow_ips = os.getenv("FORWARDED_ALLOW_IPS", "*")
 
 cores = multiprocessing.cpu_count()
 workers_per_core = float(workers_per_core_str)
