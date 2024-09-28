@@ -110,7 +110,7 @@ FROM top_items ti, total_count tc ORDER BY percentage DESC;
 """
         result = await session.exec(statement=text(query))
         for r in result.fetchall():
-            label: str = r[0]
+            label: str = r[0] or "Unknown"
             count: int = 0 if not r[1] else r[1]
             percentage: float = 0 if not r[2] else r[2]
 
