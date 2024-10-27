@@ -2,7 +2,7 @@ from collections.abc import Sequence
 from datetime import datetime, timezone
 from typing import Annotated
 
-from fastapi import APIRouter, Header, Query
+from fastapi import APIRouter, Header, HTTPException, Query, status
 from sqlmodel import select, text
 
 from ...core.config import settings
@@ -23,6 +23,12 @@ async def create_record(
     real_ip: Annotated[str | None, Header(alias="X-Real-IP")] = None,
 ) -> CensusRecord:
     now = datetime.now(tz=timezone.utc)
+
+    if record.deployment_id in settings.DEPLOYMENT_IDS_TO_IGNORE:
+        raise HTTPException(
+            status_code=status.HTTP_406_NOT_ACCEPTABLE,
+            detail="Deployment ID is the same as used in example configuration",
+        )
 
     statement = select(CensusRecord).where(
         CensusRecord.deployment_id == record.deployment_id

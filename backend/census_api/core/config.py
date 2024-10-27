@@ -71,6 +71,8 @@ class Settings(BaseSettings):
     DISCORD_WEBHOOK_USERNAME: str = "Peering Manager Census"
     DISCORD_WEBHOOK_URL: str = ""
 
+    DEPLOYMENT_IDS_TO_IGNORE: list[str] = []
+
     def _check_default_secret(self, var_name: str, value: str | None) -> None:
         if value == "changethis":
             message = (

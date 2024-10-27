@@ -29,6 +29,20 @@ async def test_create_census_record(client: AsyncClient) -> None:
     assert data["updated_at"]
 
 
+async def test_create_census_record_fail(client: AsyncClient) -> None:
+    settings.DEPLOYMENT_IDS_TO_IGNORE = ["invalid"]
+
+    response = await client.post(
+        f"{settings.API_V1_STR}/records/",
+        json={
+            "deployment_id": "invalid",
+            "version": "1.9.0",
+            "python_version": "3.12.0",
+        },
+    )
+    assert response.status_code == codes.NOT_ACCEPTABLE
+
+
 @pytest.mark.usefixtures("discord_notification")
 async def test_update_census_record(session: AsyncSession, client: AsyncClient) -> None:
     # Insert who a date to avoid rate limiting
