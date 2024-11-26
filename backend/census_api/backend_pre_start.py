@@ -30,7 +30,7 @@ async def init(*, engine: AsyncEngine) -> None:
             # Try to create session to check if DB is awake
             await session.exec(select(1))
     except Exception as exc:
-        logger.exception()
+        logger.error(exc)
         raise exc
 
 
