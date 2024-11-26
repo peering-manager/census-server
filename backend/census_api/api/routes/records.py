@@ -92,7 +92,7 @@ async def read_summary(*, session: SessionDep) -> CensusSummaries:
         "country": [],
     }
 
-    for item in summaries:
+    for item, values in summaries.items():
         query = f"""
 WITH item_counts AS (
     SELECT {item}, COUNT(*) AS item_count FROM censusrecord GROUP BY {item}
@@ -123,12 +123,10 @@ FROM top_items ti, total_count tc ORDER BY percentage DESC;
             if label == "other" and count == 0:
                 continue
 
-            summaries[item].append(
+            values.append(
                 CensusSummary(label=label, count=count, percentage=percentage)
             )
         # Sort by count reverse (higher to lower) and consider other always to be last
-        summaries[item].sort(
-            key=lambda k: k.count if k.label != "other" else 0, reverse=True
-        )
+        values.sort(key=lambda k: k.count if k.label != "other" else 0, reverse=True)
 
     return CensusSummaries(**summaries)
