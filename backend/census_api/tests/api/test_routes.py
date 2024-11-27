@@ -85,6 +85,42 @@ async def test_update_census_record(session: AsyncSession, client: AsyncClient) 
     assert records[0].updated_at == datetime.fromisoformat(data["updated_at"])
 
 
+@pytest.mark.usefixtures("discord_notification")
+async def test_delete_expired_census_record(
+    session: AsyncSession, client: AsyncClient
+) -> None:
+    # Create an expired record
+    past = datetime.now(tz=timezone.utc) - timedelta(days=settings.RECORD_RETENTION)
+    census = CensusRecord(
+        deployment_id="aaaaaaaaa",
+        version="1.8.0",
+        python_version="3.10.0",
+        country="FR",
+        created_at=past,
+        updated_at=past,
+    )
+    session.add(census)
+    await session.commit()
+
+    # Make a request to force records cleanup
+    await client.post(
+        f"{settings.API_V1_STR}/records/",
+        json={
+            "deployment_id": "bbbbbbbbb",
+            "version": "1.9.0",
+            "python_version": "3.12.0",
+        },
+    )
+
+    results = await session.exec(statement=select(CensusRecord))
+    records = results.all()
+
+    # First record should have been deleted
+    assert len(records) == 1
+    assert records[0].created_at.astimezone(timezone.utc) > past
+    assert records[0].updated_at.astimezone(timezone.utc) > past
+
+
 async def test_update_census_record_rate_limited(
     session: AsyncSession, client: AsyncClient
 ) -> None:

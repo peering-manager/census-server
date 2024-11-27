@@ -10,7 +10,7 @@ from ...core.dependencies import SessionDep
 from ...enums import CensusRecordEvent
 from ...models import CensusRecord, CensusRecordUpdate, CensusSummaries, CensusSummary
 from ...notifications import discord_notify
-from ...utils import resolve_country_for_ip
+from ...utils import delete_expired_records, resolve_country_for_ip
 
 router = APIRouter()
 
@@ -23,6 +23,8 @@ async def create_record(
     real_ip: Annotated[str | None, Header(alias="X-Real-IP")] = None,
 ) -> CensusRecord:
     now = datetime.now(tz=timezone.utc)
+
+    await delete_expired_records(session=session, start_time=now)
 
     if record.deployment_id in settings.DEPLOYMENT_IDS_TO_IGNORE:
         raise HTTPException(

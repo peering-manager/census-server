@@ -1,12 +1,27 @@
 import ipaddress
 import logging
+from datetime import datetime, timedelta
 
 import httpx
+from sqlmodel import delete
+from sqlmodel.ext.asyncio.session import AsyncSession
 
 from .core.config import settings
+from .models import CensusRecord
 
 
 async def resolve_country_for_ip(*, ip_address: str) -> str | None:
+    """
+    Return a country given an IP address.
+
+    The resolution is performed by using the ipinfo.io API.
+
+    Args:
+        ip_address (str): IP address to get the country for.
+
+    Returns:
+        str | None: A country code or none if the IP does not resolve to a country.
+    """
     if not settings.IPINFO_TOKEN:
         logging.error("cannot use ipinfo lookup, IPINFO_TOKEN not set")
         return None
@@ -28,3 +43,24 @@ async def resolve_country_for_ip(*, ip_address: str) -> str | None:
 
         country_code = r.json().get("country", None)
         return str(country_code) if country_code else None
+
+
+async def delete_expired_records(*, session: AsyncSession, start_time: datetime) -> int:
+    """
+    Delete expired records from the database.
+
+    Args:
+        session (AsyncSession): Database session in which to execute queries.
+        start_time (datetime): Base time to compute retention time window.
+
+    Returns:
+        int: Number of rows affected.
+    """
+    cut_off = start_time - timedelta(days=settings.RECORD_RETENTION)
+    result = await session.exec(
+        delete(CensusRecord).where(CensusRecord.updated_at < cut_off)
+    )
+    await session.commit()
+
+    logging.info(f"deleted {result.rowcount} expired census records")
+    return result.rowcount

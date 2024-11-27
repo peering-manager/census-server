@@ -63,6 +63,7 @@ class Settings(BaseSettings):
             path=self.POSTGRES_DB,
         )
 
+    RECORD_RETENTION: int = 365  # Number of days to keep records without updates
     RATE_LIMIT: int = 3600 * 6  # Time in second between two updates
 
     IPINFO_API_URL: str = "https://ipinfo.io/"
