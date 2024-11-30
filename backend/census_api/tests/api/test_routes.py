@@ -24,7 +24,7 @@ async def test_create_census_record(client: AsyncClient) -> None:
     assert response.status_code == codes.OK
     assert data["deployment_id"] == "aaaaaaaaa"
     assert data["version"] == "1.9.0"
-    assert data["python_version"] == "3.12.0"
+    assert data["python_version"] == "3.12"
     assert data["created_at"]
     assert data["updated_at"]
 
@@ -50,7 +50,7 @@ async def test_update_census_record(session: AsyncSession, client: AsyncClient) 
     census = CensusRecord(
         deployment_id="aaaaaaaaa",
         version="1.8.0",
-        python_version="3.10.0",
+        python_version="3.10",
         country="FR",
         created_at=past,
         updated_at=past,
@@ -128,7 +128,7 @@ async def test_update_census_record_rate_limited(
     census = CensusRecord(
         deployment_id="aaaaaaaaa",
         version="1.8.0",
-        python_version="3.10.0",
+        python_version="3.10",
         country="FR",
         created_at=past,
         updated_at=past,
@@ -169,7 +169,7 @@ async def test_read_censuses(session: AsyncSession, client: AsyncClient) -> None
     census_1 = CensusRecord(
         deployment_id="aaaaaaaaa",
         version="1.8.0",
-        python_version="3.10.0",
+        python_version="3.10",
         country="FR",
         created_at=now,
         updated_at=now,
@@ -177,7 +177,7 @@ async def test_read_censuses(session: AsyncSession, client: AsyncClient) -> None
     census_2 = CensusRecord(
         deployment_id="bbbbbbbbb",
         version="1.9.0",
-        python_version="3.12.0",
+        python_version="3.12",
         country="GB",
         created_at=now,
         updated_at=now,
@@ -233,16 +233,16 @@ async def test_read_summary(session: AsyncSession, client: AsyncClient) -> None:
         "1.5.0",
     ]
     python_versions = [
-        "3.10.0",
-        "3.11.0",
-        "3.11.0",
-        "3.12.0",
-        "3.12.0",
-        "3.12.0",
-        "3.9.0",
-        "3.9.0",
-        "3.9.0",
-        "3.9.0",
+        "3.10",
+        "3.11",
+        "3.11",
+        "3.12",
+        "3.12",
+        "3.12",
+        "3.9",
+        "3.9",
+        "3.9",
+        "3.9",
     ]
     countries = ["FR", "GB", "DE", "IT", "FR", "GB", "US", "US", "US", "CA"]
     for deployment_id, version, python_version, country in zip(
@@ -300,22 +300,22 @@ async def test_read_summary(session: AsyncSession, client: AsyncClient) -> None:
         "python_version": [
             {
                 "count": 4,
-                "label": "3.9.0",
+                "label": "3.9",
                 "percentage": 40.0,
             },
             {
                 "count": 3,
-                "label": "3.12.0",
+                "label": "3.12",
                 "percentage": 30.0,
             },
             {
                 "count": 2,
-                "label": "3.11.0",
+                "label": "3.11",
                 "percentage": 20.0,
             },
             {
                 "count": 1,
-                "label": "3.10.0",
+                "label": "3.10",
                 "percentage": 10.0,
             },
         ],

@@ -10,7 +10,7 @@ from ...core.dependencies import SessionDep
 from ...enums import CensusRecordEvent
 from ...models import CensusRecord, CensusRecordUpdate, CensusSummaries, CensusSummary
 from ...notifications import discord_notify
-from ...utils import delete_expired_records, resolve_country_for_ip
+from ...utils import delete_expired_records, resolve_country_for_ip, version_strip_micro
 
 router = APIRouter()
 
@@ -49,14 +49,16 @@ async def create_record(
             or db_record.python_version != record.python_version
         ) and interval >= settings.RATE_LIMIT:
             db_record.version = record.version
-            db_record.python_version = record.python_version
+            db_record.python_version = version_strip_micro(
+                version=record.python_version
+            )
             db_record.updated_at = now
             event = CensusRecordEvent.UPDATED
     else:
         db_record = CensusRecord(
             deployment_id=record.deployment_id,
             version=record.version,
-            python_version=record.python_version,
+            python_version=version_strip_micro(version=record.python_version),
             created_at=now,
             updated_at=now,
         )

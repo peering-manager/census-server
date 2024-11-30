@@ -3,6 +3,7 @@ import logging
 from datetime import datetime, timedelta
 
 import httpx
+from packaging.version import InvalidVersion, Version
 from sqlmodel import delete
 from sqlmodel.ext.asyncio.session import AsyncSession
 
@@ -43,6 +44,26 @@ async def resolve_country_for_ip(*, ip_address: str) -> str | None:
 
         country_code = r.json().get("country", None)
         return str(country_code) if country_code else None
+
+
+def version_strip_micro(*, version: str | None) -> str | None:
+    """
+    Given a version, return a string with only the major and minor version numbers.
+
+    Args:
+        version (str | None): The version to use, if None, it will be returned as is.
+
+    Returns:
+        str | None: A  X.Y version with X being the major number and Y the minor number.
+    """
+    if not version:
+        return version
+
+    try:
+        parsed = Version(version=version)
+        return f"{parsed.major}.{parsed.minor}"
+    except InvalidVersion:
+        return None
 
 
 async def delete_expired_records(*, session: AsyncSession, start_time: datetime) -> int:
