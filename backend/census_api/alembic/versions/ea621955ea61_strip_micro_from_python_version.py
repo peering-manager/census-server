@@ -20,7 +20,7 @@ depends_on: Union[str, Sequence[str], None] = None
 
 def upgrade() -> None:
     op.execute(
-        """
+        r"""
         UPDATE "censusrecord"
         SET "python_version" = regexp_replace("python_version", '^(\d+\.\d+)\..*$', '\1')
         WHERE "python_version" ~ '^(\d+\.\d+)\..*$'
