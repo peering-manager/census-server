@@ -10,6 +10,12 @@
     <script src="https://getbootstrap.com/docs/5.3/assets/js/color-modes.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
+        html[data-bs-theme="dark"] .hide-theme-dark {
+          display: none !important;
+        }
+        html[data-bs-theme="light"] .hide-theme-light {
+          display: none !important;
+        }
         .bi {
           vertical-align: -.125em;
           fill: currentColor;
@@ -53,7 +59,7 @@
           <path d="M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0zm0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13zm8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5zM3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8zm10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0zm-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0zm9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707zM4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708z"/>
         </symbol>
     </svg>
-  
+
     <div class="dropdown position-fixed bottom-0 end-0 mb-3 me-3 bd-mode-toggle">
         <button class="btn btn-bd-primary py-2 dropdown-toggle d-flex align-items-center"
                 id="bd-theme"
@@ -93,11 +99,10 @@
         <div class="container py-4">
             <header class="pb-3 mb-4 border-bottom">
                 <a href="/" class="d-flex align-items-center text-body-emphasis text-decoration-none">
-                    <picture>
-                      <source srcset="img/inline-light.svg" type="image/svg+xml">
-                      <img src="img/inline-dark.svg" class="img-fluid" alt="Peering Manager Logo">
-                    </picture>
-                    
+                    <!--
+                    <img src="img/inline-light.svg" width="200" class="hide-theme-dark" alt="Peering Manager">
+                    <img src="img/inline-dark.svg" width="200" class="hide-theme-light" alt="Peering Manager">
+                    -->
                     <span class="fs-4">Peering Manager Census Summary</span>
                 </a>
             </header>
@@ -114,12 +119,12 @@
             </div>
             <div class="row pt-3 mt-4 border-top">
               <p>This page displays a summary of Peering Manager instances that are running. This census reporting is enabled for Peering Manager version 1.9.0 onwards.</p>
-              <p>If you run an instance yourself but do not want to appear in this reporting, you can turn it off by having <code>CENSUS_REPORTING_ENABLED = False</code> in the configuration as described in the <a href="https://docs.peering-manager.net/configuration/miscellaneous/#census_reporting_enabled">documentation</a>.</p>
+              <p>If you run an instance but do not want to appear in this reporting, you can turn it off by having <code>CENSUS_REPORTING_ENABLED = False</code> in the configuration as described in the <a href="https://docs.peering-manager.net/configuration/miscellaneous/#census_reporting_enabled">documentation</a>.</p>
               <p>The code in charge of this census reporting is publicly available on <a href="https://github.com/peering-manager/census-server">GitHub</a>.</p>
             </div>
         </div>
     </main>
-    
+
     <script>
         async function fetchData() {
             const response = await fetch("/api/v1/records/summary/");
