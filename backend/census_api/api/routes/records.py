@@ -43,15 +43,14 @@ async def create_record(
         interval = (
             now - db_record.updated_at.astimezone(tz=timezone.utc)
         ).total_seconds()
+        python_version = version_strip_micro(version=record.python_version)
 
         if (
             db_record.version != record.version
-            or db_record.python_version != record.python_version
+            or db_record.python_version != python_version
         ) and interval >= settings.RATE_LIMIT:
             db_record.version = record.version
-            db_record.python_version = version_strip_micro(
-                version=record.python_version
-            )
+            db_record.python_version = python_version
             db_record.updated_at = now
             event = CensusRecordEvent.UPDATED
     else:
