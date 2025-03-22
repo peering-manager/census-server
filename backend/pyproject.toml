@@ -1,36 +1,37 @@
-[tool.poetry]
+[project]
 name = "census_api"
 version = "0.1.1"
 description = ""
-authors = ["Guillaume Mazoyer <oss@mazoyer.eu>"]
-package-mode = false
+authors = [{ name = "Guillaume Mazoyer", email = "oss@mazoyer.eu" }]
+requires-python = ">=3.10"
+dependencies = [
+    "uvicorn[standard]>=0.32.1",
+    "gunicorn>=23.0.0",
+    "fastapi>=0.115.5",
+    "pydantic>=2.10.2",
+    "pydantic-settings>=2.6.1",
+    "httpx>=0.28.0",
+    "psycopg[binary]>=3.2.3",
+    "alembic>=1.14.0",
+    "sqlmodel>=0.0.22",
+    "tenacity>=9.0.0",
+    "emoji-country-flag>=2.0.1",
+    "greenlet>=3.1.1",
+]
 
-[tool.poetry.dependencies]
-python = "^3.10"
-uvicorn = { extras = ["standard"], version = "^0.32.1" }
-gunicorn = "^23.0.0"
-fastapi = "^0.115.5"
-pydantic = "^2.10.2"
-pydantic-settings = "^2.6.1"
-httpx = "^0.28.0"
-psycopg = { extras = ["binary"], version = "^3.2.3" }
-alembic = "^1.14.0"
-sqlmodel = "^0.0.22"
-tenacity = "^9.0.0"
-emoji-country-flag = "^2.0.1"
-greenlet = "^3.1.1"
-
-[tool.poetry.group.dev.dependencies]
-pytest = "^8.3"
-pytest-asyncio = "^0.24"
-pytest-httpx = "^0.35"
-aiosqlite = "^0.20"
-mypy = "^1.13"
-ruff = "^0.8"
+[tool.uv]
+dev-dependencies = [
+    "pytest>=8.3",
+    "pytest-asyncio>=0.24",
+    "pytest-httpx>=0.35",
+    "aiosqlite>=0.20",
+    "mypy>=1.13",
+    "ruff>=0.8",
+]
 
 [build-system]
-requires = ["poetry>=1.8.3"]
-build-backend = "poetry.masonry.api"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
@@ -83,9 +84,9 @@ select = [
     "YTT",   # flake8-2020
 ]
 
+[tool.ruff.lint.per-file-ignores]
+"census_api/tests/**" = ["ARG001"]
+
 [tool.ruff.lint.pyupgrade]
 # Preserve types, even if a file imports `from __future__ import annotations`.
 keep-runtime-typing = true
-
-[tool.ruff.lint.per-file-ignores]
-"census_api/tests/**" = ["ARG001"]

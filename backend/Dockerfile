@@ -1,8 +1,9 @@
 ARG PYTHON_VER=3.13
 FROM docker.io/python:${PYTHON_VER}-slim AS base
 
-ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
+
+WORKDIR /app/
 
 RUN apt-get update && \
     apt-get upgrade -y && \
@@ -12,20 +13,24 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/* && \
     rm -rf /var/lib/apt/lists/* 
 
-RUN curl -sSL https://install.python-poetry.org | POETRY_HOME=/opt/poetry python && \
-    cd /usr/local/bin && \
-    ln -s /opt/poetry/bin/poetry && \
-    poetry config virtualenvs.create false
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
-COPY ./census_api /app/census_api
-WORKDIR /app/
+ENV PATH="/app/.venv/bin:$PATH"
+ENV UV_COMPILE_BYTECODE=1
+ENV UV_LINK_MODE=copy
+
+RUN --mount=type=cache,target=/root/.cache/uv \
+    --mount=type=bind,source=uv.lock,target=uv.lock \
+    --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
+    uv sync --frozen --no-install-project
 
 ENV PYTHONPATH=/app
 
-COPY ./pyproject.toml ./poetry.lock* /app/
-# Allow installing dev dependencies to run tests
-ARG INSTALL_DEV=false
-RUN bash -c "if [ $INSTALL_DEV == 'true' ] ; then poetry install --no-root ; else poetry install --no-root --only main ; fi"
+COPY ./pyproject.toml ./uv.lock ./alembic.ini /app/
+COPY ./census_api /app/census_api
+
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync
 
 COPY ./gunicorn_conf.py /gunicorn_conf.py
 
