@@ -5,14 +5,14 @@ description = ""
 authors = [{ name = "Guillaume Mazoyer", email = "oss@mazoyer.eu" }]
 requires-python = ">=3.10"
 dependencies = [
-    "uvicorn[standard]>=0.32.1",
+    "uvicorn[standard]>=0.34.3",
     "gunicorn>=23.0.0",
-    "fastapi>=0.115.5",
-    "pydantic>=2.10.2",
-    "pydantic-settings>=2.6.1",
-    "httpx>=0.28.0",
-    "psycopg[binary]>=3.2.3",
-    "alembic>=1.14.0",
+    "fastapi>=0.115.12",
+    "pydantic>=2.11.5",
+    "pydantic-settings>=2.9.1",
+    "httpx>=0.28.1",
+    "psycopg[binary]>=3.2.9",
+    "alembic>=1.16.1",
     "sqlmodel>=0.0.24",
     "tenacity>=9.0.0",
     "emoji-country-flag>=2.0.1",
@@ -21,12 +21,12 @@ dependencies = [
 
 [tool.uv]
 dev-dependencies = [
-    "pytest>=8.3",
-    "pytest-asyncio>=0.24",
+    "pytest>=8.4",
+    "pytest-asyncio>=1.0",
     "pytest-httpx>=0.35",
-    "aiosqlite>=0.20",
-    "mypy>=1.13",
-    "ruff>=0.8",
+    "aiosqlite>=0.21",
+    "mypy>=1.16",
+    "ruff>=0.11",
 ]
 
 [build-system]
