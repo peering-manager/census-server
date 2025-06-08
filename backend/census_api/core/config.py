@@ -66,7 +66,7 @@ class Settings(BaseSettings):
     RECORD_RETENTION: int = 365  # Number of days to keep records without updates
     RATE_LIMIT: int = 3600 * 6  # Time in second between two updates
 
-    IPINFO_API_URL: str = "https://ipinfo.io/"
+    IPINFO_API_URL: str = "https://api.ipinfo.io/lite/"
     IPINFO_TOKEN: str = ""
 
     DISCORD_WEBHOOK_USERNAME: str = "Peering Manager Census"

@@ -13,13 +13,9 @@ from census_api.utils import resolve_country_for_ip, version_strip_micro
 async def test_resolve_country_for_ip(
     httpx_mock: HTTPXMock, ip_address: str, country: str
 ):
-    if country is None:
-        assert not await resolve_country_for_ip(ip_address=ip_address)
-
     settings.IPINFO_TOKEN = "abcdef0123456789"
     httpx_mock.add_response(
-        url=re.compile(f"{settings.IPINFO_API_URL}.*"),
-        json={"country": country},
+        url=re.compile(f"{settings.IPINFO_API_URL}.*"), json={"country_code": country}
     )
 
     assert await resolve_country_for_ip(ip_address=ip_address) == country

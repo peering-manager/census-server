@@ -42,7 +42,7 @@ async def resolve_country_for_ip(*, ip_address: str) -> str | None:
         except httpx.HTTPStatusError as exc:
             logging.error(f"ipinfo lookup failure: {exc.request.url} - {exc}")
 
-        country_code = r.json().get("country", None)
+        country_code = r.json().get("country_code", None)
         return str(country_code) if country_code else None
 
 
