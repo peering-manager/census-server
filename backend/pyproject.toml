@@ -3,31 +3,25 @@ name = "census_api"
 version = "0.1.1"
 description = ""
 authors = [{ name = "Guillaume Mazoyer", email = "oss@mazoyer.eu" }]
-requires-python = ">=3.10"
+requires-python = ">=3.10,<3.14"
 dependencies = [
-    "uvicorn[standard]>=0.34.3",
+    "uvicorn[standard]>=0.38.0",
     "gunicorn>=23.0.0",
-    "fastapi>=0.115.12",
-    "pydantic>=2.11.5",
-    "pydantic-settings>=2.9.1",
+    "fastapi>=0.123.0",
+    "pydantic>=2.12.5",
+    "pydantic-settings>=2.12.0",
     "httpx>=0.28.1",
-    "psycopg[binary]>=3.2.9",
-    "alembic>=1.16.1",
-    "sqlmodel>=0.0.24",
-    "tenacity>=9.0.0",
-    "emoji-country-flag>=2.0.1",
+    "psycopg[binary]>=3.2.13",
+    "alembic>=1.17.2",
+    "sqlmodel>=0.0.27",
+    "tenacity>=9.1.2",
+    "emoji-country-flag>=2.1.0",
     "greenlet>=3.1.1",
+    "watchfiles>=1.1.1",
 ]
 
-[tool.uv]
-dev-dependencies = [
-    "pytest>=8.4",
-    "pytest-asyncio>=1.0",
-    "pytest-httpx>=0.35",
-    "aiosqlite>=0.21",
-    "mypy>=1.16",
-    "ruff>=0.11",
-]
+[dependency-groups]
+dev = ["pytest>=8.4", "pytest-asyncio>=1.3.0", "pytest-httpx>=0.35", "aiosqlite>=0.21", "mypy>=1.19", "ruff>=0.14"]
 
 [build-system]
 requires = ["hatchling"]
