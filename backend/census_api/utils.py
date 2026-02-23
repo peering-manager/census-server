@@ -1,14 +1,10 @@
 import ipaddress
 import logging
-from datetime import datetime, timedelta
 
 import httpx
 from packaging.version import InvalidVersion, Version
-from sqlmodel import delete
-from sqlmodel.ext.asyncio.session import AsyncSession
 
 from .core.config import settings
-from .models import CensusRecord
 
 
 async def resolve_country_for_ip(*, ip_address: str) -> str | None:
@@ -64,24 +60,3 @@ def version_strip_micro(*, version: str | None) -> str | None:
         return f"{parsed.major}.{parsed.minor}"
     except InvalidVersion:
         return None
-
-
-async def delete_expired_records(*, session: AsyncSession, start_time: datetime) -> int:
-    """
-    Delete expired records from the database.
-
-    Args:
-        session (AsyncSession): Database session in which to execute queries.
-        start_time (datetime): Base time to compute retention time window.
-
-    Returns:
-        int: Number of rows affected.
-    """
-    cut_off = start_time - timedelta(days=settings.RECORD_RETENTION)
-    result = await session.exec(
-        delete(CensusRecord).where(CensusRecord.updated_at < cut_off)
-    )
-    await session.commit()
-
-    logging.info(f"deleted {result.rowcount} expired census records")
-    return result.rowcount

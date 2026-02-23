@@ -12,6 +12,7 @@ from sqlmodel.pool import StaticPool
 from census_api.core.config import settings
 from census_api.core.dependencies import get_session
 from census_api.main import app
+from census_api.notifications import _discord_notifier
 
 
 @pytest.fixture(name="session")
@@ -51,4 +52,5 @@ async def client_fixture(session: AsyncSession) -> AsyncGenerator[AsyncClient, N
 
 @pytest.fixture(name="discord_notification")
 async def _discord_notification_fixture(httpx_mock: HTTPXMock) -> None:
+    _discord_notifier._last_notified.clear()  # noqa: SLF001
     httpx_mock.add_response(url=settings.DISCORD_WEBHOOK_URL)
