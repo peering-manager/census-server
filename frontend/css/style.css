@@ -10,6 +10,13 @@ html[data-bs-theme="light"] .hide-theme-light {
   display: none !important;
 }
 
+.header-subtitle {
+  font-weight: 300;
+  font-size: 1.4rem;
+  color: var(--bs-secondary-color);
+  letter-spacing: 0.02em;
+}
+
 .bi {
   vertical-align: -.125em;
   fill: currentColor;
