@@ -7,41 +7,9 @@
     <link rel="icon" type="image/png" href="img/peering-manager.ico">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
-    <script src="https://getbootstrap.com/docs/5.3/assets/js/color-modes.js"></script>
+    <script src="js/color-modes.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        html[data-bs-theme="dark"] .hide-theme-dark {
-          display: none !important;
-        }
-        html[data-bs-theme="light"] .hide-theme-light {
-          display: none !important;
-        }
-        .bi {
-          vertical-align: -.125em;
-          fill: currentColor;
-        }
-        .btn-bd-primary {
-          --bd-orange-bg: #f7a82c;
-          --bd-orange-rgb: 112.520718, 44.062154, 249.437846;
-          --bs-btn-font-weight: 600;
-          --bs-btn-color: var(--bs-white);
-          --bs-btn-bg: var(--bd-orange-bg);
-          --bs-btn-border-color: var(--bd-orange-bg);
-          --bs-btn-hover-color: var(--bs-white);
-          --bs-btn-hover-bg: #f7a82c;
-          --bs-btn-hover-border-color: #f7a82c;
-          --bs-btn-focus-shadow-rgb: var(--bd-orange-rgb);
-          --bs-btn-active-color: var(--bs-btn-hover-color);
-          --bs-btn-active-bg: #f7a82c;
-          --bs-btn-active-border-color: #f7a82c;
-        }
-        .bd-mode-toggle {
-          z-index: 1500;
-        }
-        .bd-mode-toggle .dropdown-menu .active .bi {
-          display: block !important;
-        }
-    </style>
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
     <svg xmlns="http://www.w3.org/2000/svg" class="d-none">
@@ -99,22 +67,47 @@
         <div class="container py-4">
             <header class="pb-3 mb-4 border-bottom">
                 <a href="/" class="d-flex align-items-center text-body-emphasis text-decoration-none">
-                    <!--
                     <img src="img/inline-light.svg" width="200" class="hide-theme-dark" alt="Peering Manager">
                     <img src="img/inline-dark.svg" width="200" class="hide-theme-light" alt="Peering Manager">
-                    -->
-                    <span class="fs-4">Peering Manager Census Summary</span>
                 </a>
             </header>
-            <div class="row align-items-md-stretch">
-                <div class="col-md-4 chart-container">
-                    <canvas id="version-chart"></canvas>
+            <noscript>
+                <div class="alert alert-warning">JavaScript is required to display the census charts.</div>
+            </noscript>
+            <div id="error-banner"></div>
+            <div class="row g-4">
+                <div class="col-md-4" id="version-chart">
+                    <div class="chart-card">
+                        <div class="chart-title">Versions</div>
+                        <div class="chart-spinner">
+                            <div class="spinner-border text-secondary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
+                        <canvas class="d-none"></canvas>
+                    </div>
                 </div>
-                <div class="col-md-4 chart-container">
-                    <canvas id="python_version-chart"></canvas>
+                <div class="col-md-4" id="python_version-chart">
+                    <div class="chart-card">
+                        <div class="chart-title">Python Versions</div>
+                        <div class="chart-spinner">
+                            <div class="spinner-border text-secondary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
+                        <canvas class="d-none"></canvas>
+                    </div>
                 </div>
-                <div class="col-md-4 chart-container">
-                    <canvas id="country-chart"></canvas>
+                <div class="col-md-4" id="country-chart">
+                    <div class="chart-card">
+                        <div class="chart-title">Countries</div>
+                        <div class="chart-spinner">
+                            <div class="spinner-border text-secondary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
+                        <canvas class="d-none"></canvas>
+                    </div>
                 </div>
             </div>
             <div class="row pt-3 mt-4 border-top">
@@ -125,40 +118,6 @@
         </div>
     </main>
 
-    <script>
-        async function fetchData() {
-            const response = await fetch("/api/v1/records/summary/");
-            return await response.json();
-        }
-
-        function renderChart(ctx, title, summary) {
-            new Chart(ctx, {
-                type: 'pie',
-                data: {
-                    labels: summary.map(({ label }) => label),
-                    datasets: [{ data: summary.map(({ percentage }) => percentage) }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: { position: "bottom" },
-                        title: {  display: true, text: title },
-                    },
-                    animation: { animateRotate: false, animateScale: false }
-                }
-            });
-        }
-
-        async function init() {
-            const data = await fetchData();
-            const titles = {"version": "Top 5 Versions by %", "python_version": "Top 5 Python Versions by %", "country": "Top 5 Countries by %"};
-
-            for (let [kind, summary] of Object.entries(data)) {
-                let ctx = document.getElementById(kind + '-chart').getContext('2d');
-                renderChart(ctx, titles[kind], summary)
-            }
-        }
-        window.onload = init;
-    </script>
+    <script src="js/charts.js"></script>
 </body>
 </html>
